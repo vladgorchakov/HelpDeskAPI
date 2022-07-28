@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # installed apps
-    # created apps
+    # local apps
     'helpdesk.apps.HelpdeskConfig',
 ]
 
