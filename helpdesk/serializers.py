@@ -9,3 +9,13 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ticket = serializers.SlugRelatedField(slug_field='title', queryset=Ticket.objects.all())
+    past_message = serializers.SlugRelatedField(slug_field='text', queryset=Message.objects.all())
+
+    class Meta:
+        model = Message
+        fields = '__all__'
