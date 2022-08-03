@@ -1,4 +1,6 @@
 from rest_framework import viewsets, mixins
+from rest_framework.response import Response
+
 from api import serializers
 from helpdesk import models
 
@@ -15,3 +17,19 @@ class SupportTicketViewSet(mixins.ListModelMixin,
     serializer_class = serializers.SupportTecketSerializer
     queryset = models.Ticket.objects.all()
 
+    def list(self, request, *args, **kwargs):
+        if 'status' in request.data:
+            status = request.data['status']
+            try:
+                queryset = models.Ticket.objects.filter(status=status)
+            except ValueError:
+                return Response({'error': 'ValueError'})
+
+        else:
+            queryset = models.Ticket.objects.all()
+
+        serializer = serializers.SupportTecketSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        return models.Ticket.objects.all()
