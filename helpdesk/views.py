@@ -1,13 +1,2 @@
-from rest_framework.viewsets import ModelViewSet
-from helpdesk.models import Ticket, Message
-from helpdesk.serializers import TicketSerializer, MessageSerializer
+from rest_framework import serializers
 
-
-class TicketViewSet(ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
-
-
-class MessageViewSet(ModelViewSet):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
