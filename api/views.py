@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from api import serializers
+from helpdesk import models
 
-# Create your views here.
+
+class UserTicketViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.UserTicketSerializer
+    queryset = models.Ticket.objects.all()

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # local apps
     'helpdesk.apps.HelpdeskConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [

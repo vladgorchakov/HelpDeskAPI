@@ -25,7 +25,7 @@ class Ticket(models.Model):
         return f'{self.title} [{self.pk}]'
 
     def __int__(self):
-        return f'{self.pk}'
+        return self.pk
 
 
 class Message(models.Model):
