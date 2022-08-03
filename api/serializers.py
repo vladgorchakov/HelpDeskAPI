@@ -12,7 +12,7 @@ class UserTicketSerializer(serializers.ModelSerializer):
 
 
 class SupportTecketSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(read_only=True)
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
     title = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
     status = serializers.SlugRelatedField(slug_field='title', queryset=models.Status.objects.all())
