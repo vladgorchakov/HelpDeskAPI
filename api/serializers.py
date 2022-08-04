@@ -7,9 +7,7 @@ class MessageSerializer(serializers.ModelSerializer):
     ticket = serializers.SlugRelatedField(slug_field='id',
                                           queryset=models.Ticket.objects.all()
                                           )
-    past_message = serializers.SlugRelatedField(slug_field='id',
-                                                queryset=models.Message.objects.all()
-                                                )
+    past_message = serializers.PrimaryKeyRelatedField(queryset=models.Message.objects.all())
 
     def validate(self, value):
         user_id = self.context['request'].user.id
@@ -17,10 +15,16 @@ class MessageSerializer(serializers.ModelSerializer):
         past_message_id = self.context['request'].data['past_message']
 
         ticket = models.Ticket.objects.get(pk=ticket_id)
+        past_message = models.Message.objects.get(pk=past_message_id)
         if not ticket.user.pk == user_id:
             raise serializers.ValidationError(
                 'User is not owner of this ticket'
             )
+        elif not past_message.sender.pk == user_id:
+            raise serializers.ValidationError(
+                'User is not owner of past message'
+            )
+
         return value
 
     class Meta:
@@ -28,13 +32,22 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ('id', 'sender', 'ticket', 'text', 'past_message',)
 
 
-class UserTicketSerializer(serializers.ModelSerializer):
+class UserTicketListSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     status = serializers.SlugRelatedField('title', read_only=True)
-    # messages = MessageSerializer(many=True)
+
     class Meta:
         model = models.Ticket
-        fields = ('id', 'user', 'title', 'description', 'status', 'create_time', 'update_time',)
+        fields = ('id', 'user', 'title', 'status',)
+
+
+class UserTicketDetailSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    status = serializers.SlugRelatedField('title', read_only=True)
+
+    class Meta:
+        model = models.Ticket
+        fields = '__all__'
 
 
 class SupportTecketSerializer(serializers.ModelSerializer):

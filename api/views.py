@@ -3,14 +3,20 @@ from rest_framework.response import Response
 from django.contrib.auth.models import Group, User
 from api import serializers
 from helpdesk import models
+from rest_framework.permissions import IsAdminUser
 
 
 class UserTicketViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.UserTicketSerializer
 
     def get_queryset(self):
         user = self.request.user
         return models.Ticket.objects.filter(user=user)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.UserTicketListSerializer
+        else:
+            return serializers.UserTicketDetailSerializer
 
 
 class SupportTicketViewSet(mixins.ListModelMixin,
@@ -18,7 +24,7 @@ class SupportTicketViewSet(mixins.ListModelMixin,
                            mixins.UpdateModelMixin,
                            viewsets.GenericViewSet):
     serializer_class = serializers.SupportTecketSerializer
-    queryset = models.Ticket.objects.all()
+    permission_classes = (IsAdminUser, )
 
     def list(self, request, *args, **kwargs):
         if 'status' in request.data:
