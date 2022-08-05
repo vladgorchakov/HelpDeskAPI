@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from django.contrib.auth.models import Group, User
 from api import serializers
 from helpdesk import models
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 
 class UserTicketViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
@@ -46,16 +47,9 @@ class SupportTicketViewSet(mixins.ListModelMixin,
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.MessageSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
         msg = models.Message.objects.filter(ticket__user=user)
         return msg
-
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     # user = User.objects.get(username=self.request.user)
-    #     group = Group.objects.get(name='HelpDeskUser')
-    #     print(group)
-    #     print(user.groups.all())
-    #     return models.Message.objects.all()
