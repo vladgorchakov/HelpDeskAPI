@@ -60,10 +60,11 @@ class TicketDetailSerializer(serializers.ModelSerializer):
                                      default=models.Ticket.Status.added,
                                      read_only=True
                                      )
+    messages = MessageListSerializer(many=True)
 
     class Meta:
         model = models.Ticket
-        fields = '__all__'
+        fields = ('id', 'user', 'title', 'status', 'description', 'messages')
 
 
 class SupportTicketDetailSerializer(serializers.ModelSerializer):

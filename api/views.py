@@ -25,16 +25,15 @@ class TicketViewSet(viewsets.ModelViewSet):
 
         return serializers.TicketDetailSerializer
 
+
 class MessageViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.MessageSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthor,)
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff or user.is_superuser:
+        if self.request.user.is_staff:
             return models.Message.objects.all()
         else:
-            return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
+            return models.Message.objects.filter(ticket__user=self.request.user).order_by('-update_time')
 
     def get_serializer_class(self):
         if self.action == 'list':
