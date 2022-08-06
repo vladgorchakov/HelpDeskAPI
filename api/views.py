@@ -19,19 +19,9 @@ class TicketViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return serializers.TicketReadOnlySerializer
-        elif self.action == 'create':
-            return serializers.TicketDetailSerializer
-        if self.request.user.is_staff:
-            if self.action == 'create':
-                return serializers.TicketDetailSerializer
-            elif self.action == 'update':
-                if self.request.user == models.Ticket.objects.get(pk=self.kwargs['pk']).user:
-                    return serializers.TicketDetailSerializer
-                else:
-                    return serializers.SupportTicketDetailSerializer
-        else:
-            if self.action in ('create', 'update'):
-                return serializers.TicketDetailSerializer
+        elif self.action == 'update' and self.request.user.is_staff:
+            if self.request.user != models.Ticket.objects.get(pk=self.kwargs['pk']).user:
+                return serializers.SupportTicketDetailSerializer
 
         return serializers.TicketDetailSerializer
 
