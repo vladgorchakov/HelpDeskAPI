@@ -44,14 +44,17 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ('id', 'sender', 'ticket', 'text', 'past_message',)
 
 
-class UserTicketListSerializer(serializers.ModelSerializer):
+class TicketReadOnlySerializer(serializers.ModelSerializer):
+    title = serializers.CharField(read_only=True)
+    status = serializers.IntegerField(read_only=True)
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = models.Ticket
-        fields = ('id', 'title', 'status',)
+        fields = ('id', 'user', 'title', 'status',)
 
 
-class UserTicketDetailSerializer(serializers.ModelSerializer):
+class TicketDetailSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     status = serializers.ChoiceField(choices=models.Ticket.Status.choices,
                                      default=models.Ticket.Status.added,
@@ -79,7 +82,6 @@ class SupportTicketDetailSerializer(serializers.ModelSerializer):
                              models.Ticket.Status.choices[validated_data['status']][1]
                              )
         return instance
-
 
     class Meta:
         model = models.Ticket

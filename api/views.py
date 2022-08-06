@@ -3,20 +3,38 @@ from rest_framework.response import Response
 from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from api.permissions import IsAuthor
 
 
-class UserTicketViewSet(viewsets.ModelViewSet):
+class TicketViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.TicketReadOnlySerializer
 
     def get_queryset(self):
         user = self.request.user
+        if self.request.user.is_staff:
+            return models.Ticket.objects.all()
         return models.Ticket.objects.filter(user=user).order_by('-update_time')
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return serializers.UserTicketListSerializer
+            return serializers.TicketReadOnlySerializer
+        elif self.action == 'create':
+            return serializers.TicketDetailSerializer
+        if self.request.user.is_staff:
+            if self.action == 'create':
+                return serializers.TicketDetailSerializer
+            elif self.action == 'update':
+                if self.request.user == models.Ticket.objects.get(pk=self.kwargs['pk']).user:
+                    return serializers.TicketDetailSerializer
+                else:
+                    return serializers.SupportTicketDetailSerializer
         else:
-            return serializers.UserTicketDetailSerializer
+            if self.action in ('create', 'update'):
+                return serializers.TicketDetailSerializer
+
+        return serializers.TicketDetailSerializer
+
 
 
 class SupportTicketViewSet(mixins.ListModelMixin,
@@ -39,7 +57,7 @@ class SupportTicketViewSet(mixins.ListModelMixin,
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return serializers.UserTicketListSerializer
+            return serializers.TicketReadOnlySerializer
         else:
             return serializers.SupportTicketDetailSerializer
 
@@ -50,11 +68,10 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        print(user.is_staff, user.is_superuser)
-        if not user.is_staff and not user.is_superuser:
-            return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
-        else:
+        if user.is_staff or user.is_superuser:
             return models.Message.objects.all()
+        else:
+            return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
 
     def get_serializer_class(self):
         if self.action == 'list':
