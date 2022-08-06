@@ -11,7 +11,7 @@ class UserTicketViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return models.Ticket.objects.filter(user=user)
+        return models.Ticket.objects.filter(user=user).order_by('-update_time')
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -24,7 +24,7 @@ class SupportTicketViewSet(mixins.ListModelMixin,
                            mixins.RetrieveModelMixin,
                            mixins.UpdateModelMixin,
                            viewsets.GenericViewSet):
-    serializer_class = serializers.SupportTecketSerializer
+    serializer_class = serializers.SupportTicketDetailSerializer
     permission_classes = (IsAdminUser, )
 
     def list(self, request, *args, **kwargs):
@@ -33,16 +33,21 @@ class SupportTicketViewSet(mixins.ListModelMixin,
             try:
                 queryset = models.Ticket.objects.filter(status=status)
             except ValueError:
-                return Response({'error': 'ValueError'})
-
+                return Response({'error': 'Status is incorrect'})
         else:
             queryset = models.Ticket.objects.all()
 
-        serializer = serializers.SupportTecketSerializer(queryset, many=True)
+        serializer = serializers.UserTicketListSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def get_queryset(self):
         return models.Ticket.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.UserTicketListSerializer
+        else:
+            return serializers.SupportTicketDetailSerializer
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -51,5 +56,5 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        msg = models.Message.objects.filter(ticket__user=user)
+        msg = models.Message.objects.filter(ticket__user=user).order_by('-update_time')
         return msg

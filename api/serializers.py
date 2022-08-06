@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from helpdesk import models
 
@@ -13,17 +14,17 @@ class MessageSerializer(serializers.ModelSerializer):
         user_id = self.context['request'].user.id
         ticket_id = self.context['request'].data['ticket']
         past_message_id = self.context['request'].data['past_message']
-
         ticket = models.Ticket.objects.get(pk=ticket_id)
         past_message = models.Message.objects.get(pk=past_message_id)
-        if not ticket.user.pk == user_id:
-            raise serializers.ValidationError(
-                'User is not owner of this ticket'
-            )
-        elif not past_message.sender.pk == user_id:
-            raise serializers.ValidationError(
-                'User is not owner of past message'
-            )
+        if not User.objects.get(pk=user_id).is_superuser:
+            if not ticket.user.pk == user_id:
+                raise serializers.ValidationError(
+                    'User is not owner of this ticket'
+                )
+            elif not past_message.sender.pk == user_id:
+                raise serializers.ValidationError(
+                    'User is not owner of past message'
+                )
 
         return value
 
@@ -50,7 +51,7 @@ class UserTicketDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SupportTecketSerializer(serializers.ModelSerializer):
+class SupportTicketDetailSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
     title = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
