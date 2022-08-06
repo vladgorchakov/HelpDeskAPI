@@ -9,4 +9,4 @@ def send(user_email, status):
         recipient_list=[user_email],
         fail_silently=False
     )
-    print('email')
+

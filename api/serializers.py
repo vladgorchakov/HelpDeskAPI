@@ -1,14 +1,14 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from helpdesk import models
-
+from api.tasks import send_email
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
     ticket = serializers.SlugRelatedField(slug_field='id',
                                           queryset=models.Ticket.objects.all()
                                           )
-    past_message = serializers.PrimaryKeyRelatedField(queryset=models.Message.objects.all())
+    past_message = serializers.PrimaryKeyRelatedField(queryset=models.Message.objects.all(), allow_null=True)
 
     def validate(self, value):
         user_id = self.context['request'].user.id
@@ -45,6 +45,7 @@ class UserTicketListSerializer(serializers.ModelSerializer):
 class UserTicketDetailSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     status = serializers.SlugRelatedField('title', read_only=True)
+    messages = MessageSerializer(read_only=True)
 
     class Meta:
         model = models.Ticket
@@ -56,6 +57,13 @@ class SupportTicketDetailSerializer(serializers.ModelSerializer):
     title = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
     status = serializers.SlugRelatedField(slug_field='title', queryset=models.Status.objects.all())
+
+    def update(self, instance, validated_data):
+        if validated_data['status'].title != instance.status:
+            instance.status = validated_data['status']
+            send_email.delay(instance.user.email, instance.status.title)
+            instance.save()
+        return instance
 
 
     class Meta:

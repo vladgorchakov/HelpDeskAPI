@@ -19,7 +19,8 @@ class UserTicketViewSet(viewsets.ModelViewSet):
             return serializers.UserTicketDetailSerializer
 
 
-class SupportTicketViewSet(mixins.RetrieveModelMixin,
+class SupportTicketViewSet(mixins.UpdateModelMixin,
+                           mixins.RetrieveModelMixin,
                            viewsets.GenericViewSet):
     serializer_class = serializers.SupportTicketDetailSerializer
     permission_classes = (IsAdminUser, )
@@ -37,17 +38,6 @@ class SupportTicketViewSet(mixins.RetrieveModelMixin,
         serializer = serializers.UserTicketListSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        status = request.data.get('status', None)
-        ticket = models.Ticket.objects.get(pk=pk)
-        if status != ticket.status.title:
-            email = ticket.user.email
-            send_email.delay(email, status)
-        serializer = serializers.SupportTicketDetailSerializer(data=request.data, instance=ticket)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
 
     def get_queryset(self):
         return models.Ticket.objects.all()
