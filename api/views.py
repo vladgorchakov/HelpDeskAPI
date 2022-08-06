@@ -25,33 +25,6 @@ class TicketViewSet(viewsets.ModelViewSet):
 
         return serializers.TicketDetailSerializer
 
-
-
-class SupportTicketViewSet(mixins.ListModelMixin,
-                           mixins.UpdateModelMixin,
-                           mixins.RetrieveModelMixin,
-                           viewsets.GenericViewSet):
-
-    permission_classes = (IsAdminUser, )
-
-    def get_queryset(self):
-        if self.action == 'list':
-            status = self.request.data.get('status', None)
-            if status:
-                try:
-                    return models.Ticket.objects.filter(status=status.pk)
-                except ValueError:
-                    return Response({'tickets': ['status does not exists']})
-
-        return models.Ticket.objects.all()
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return serializers.TicketReadOnlySerializer
-        else:
-            return serializers.SupportTicketDetailSerializer
-
-
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.MessageSerializer
     permission_classes = (IsAuthenticated,)
