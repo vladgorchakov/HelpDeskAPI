@@ -3,5 +3,5 @@ from api.service import send
 
 
 @app.task
-def send_email(user_email):
-    send(user_email)
+def send_email(user_email, status):
+    send(user_email, status)

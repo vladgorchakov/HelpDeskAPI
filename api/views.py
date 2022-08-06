@@ -48,7 +48,7 @@ class SupportTicketViewSet(mixins.ListModelMixin,
         ticket = models.Ticket.objects.get(pk=pk)
         if status != ticket.status.title:
             email = ticket.user.email
-            send_email.delay(email)
+            send_email.delay(email, status)
         serializer = serializers.SupportTicketDetailSerializer(data=request.data, instance=ticket)
         serializer.is_valid(raise_exception=True)
         serializer.save()
