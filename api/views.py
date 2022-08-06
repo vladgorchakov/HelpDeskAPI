@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from api.tasks import send_email
+
 
 class UserTicketViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -50,4 +50,13 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
+        print(user.is_staff, user.is_superuser)
+        if not user.is_staff and not user.is_superuser:
+            return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
+        else:
+            return models.Message.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.MessageListSerializer
+        return serializers.MessageSerializer

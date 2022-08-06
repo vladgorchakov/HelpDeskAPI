@@ -14,10 +14,17 @@ class Status(models.Model):
 
 
 class Ticket(models.Model):
+    class Status(models.IntegerChoices):
+        added = 0
+        accepted = 1
+        frozen = 2
+        resolved = 3
+        unresolved = 4
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=1000, blank=True, null=True)
-    status = models.ForeignKey('Status', on_delete=models.SET_NULL, blank=True, null=True)
+    status = models.IntegerField(choices=Status.choices, default=Status.added)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 
