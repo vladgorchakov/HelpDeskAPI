@@ -1,6 +1,5 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
-from django.contrib.auth.models import Group, User
 from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -11,8 +10,6 @@ class UserTicketViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        #send(user.email)
-        send_email.delay(user.email)
         return models.Ticket.objects.filter(user=user).order_by('-update_time')
 
     def get_serializer_class(self):
@@ -22,9 +19,7 @@ class UserTicketViewSet(viewsets.ModelViewSet):
             return serializers.UserTicketDetailSerializer
 
 
-class SupportTicketViewSet(mixins.ListModelMixin,
-                           mixins.RetrieveModelMixin,
-                           mixins.UpdateModelMixin,
+class SupportTicketViewSet(mixins.RetrieveModelMixin,
                            viewsets.GenericViewSet):
     serializer_class = serializers.SupportTicketDetailSerializer
     permission_classes = (IsAdminUser, )
@@ -70,5 +65,4 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        msg = models.Message.objects.filter(ticket__user=user).order_by('-update_time')
-        return msg
+        return models.Message.objects.filter(ticket__user=user).order_by('-update_time')
