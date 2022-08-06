@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group, User
 from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from .service import send
 from api.tasks import send_email
 
 class UserTicketViewSet(viewsets.ModelViewSet):
@@ -44,16 +43,15 @@ class SupportTicketViewSet(mixins.ListModelMixin,
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        print(kwargs)
         pk = kwargs.get('pk', None)
         status = request.data.get('status', None)
         ticket = models.Ticket.objects.get(pk=pk)
         if status != ticket.status.title:
             email = ticket.user.email
-            print(email)
             send_email.delay(email)
-            print('sent')
-        serializer = serializers.SupportTicketDetailSerializer(ticket)
+        serializer = serializers.SupportTicketDetailSerializer(data=request.data, instance=ticket)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
     def get_queryset(self):
