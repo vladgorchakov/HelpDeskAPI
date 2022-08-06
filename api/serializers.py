@@ -34,18 +34,15 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class UserTicketListSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    status = serializers.SlugRelatedField('title', read_only=True)
 
     class Meta:
         model = models.Ticket
-        fields = ('id', 'user', 'title', 'status',)
+        fields = ('id', 'title', 'status',)
 
 
 class UserTicketDetailSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     status = serializers.SlugRelatedField('title', read_only=True)
-    messages = MessageSerializer(read_only=True)
 
     class Meta:
         model = models.Ticket

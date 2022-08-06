@@ -19,27 +19,22 @@ class UserTicketViewSet(viewsets.ModelViewSet):
             return serializers.UserTicketDetailSerializer
 
 
-class SupportTicketViewSet(mixins.UpdateModelMixin,
+class SupportTicketViewSet(mixins.ListModelMixin,
+                           mixins.UpdateModelMixin,
                            mixins.RetrieveModelMixin,
                            viewsets.GenericViewSet):
-    serializer_class = serializers.SupportTicketDetailSerializer
+
     permission_classes = (IsAdminUser, )
 
-    def list(self, request, *args, **kwargs):
-        if 'status' in request.data:
-            status = request.data['status']
-            try:
-                queryset = models.Ticket.objects.filter(status=status)
-            except ValueError:
-                return Response({'error': 'Status is incorrect'})
-        else:
-            queryset = models.Ticket.objects.all()
-
-        serializer = serializers.UserTicketListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
     def get_queryset(self):
+        if self.action == 'list':
+            status = self.request.data.get('status', None)
+            if status:
+                try:
+                    return models.Ticket.objects.filter(status=status.pk)
+                except ValueError:
+                    return Response({'tickets': ['status does not exists']})
+
         return models.Ticket.objects.all()
 
     def get_serializer_class(self):
