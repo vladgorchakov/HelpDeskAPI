@@ -5,13 +5,15 @@ from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .service import send
+from api.tasks import send_email
 
 class UserTicketViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
-        send(user.email)
+        #send(user.email)
+        send_email.delay(user.email)
         return models.Ticket.objects.filter(user=user).order_by('-update_time')
 
     def get_serializer_class(self):
