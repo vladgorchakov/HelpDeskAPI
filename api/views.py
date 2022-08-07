@@ -38,5 +38,5 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return serializers.MessageListSerializer
-        return serializers.MessageSerializer
+            return serializers.MessageSerializer
+        return serializers.TicketMessageCreateSerializer
