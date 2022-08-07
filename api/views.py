@@ -11,6 +11,7 @@ class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TicketReadOnlySerializer
 
     def get_queryset(self):
+        print(self.request.data)
         user = self.request.user
         if self.request.user.is_staff:
             return models.Ticket.objects.all()

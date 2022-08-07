@@ -7,19 +7,15 @@ from api.tasks import send_email
 class MessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('id', 'sender', 'past_message', 'text')
+        fields = "__all__"
         model = models.Message
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    ticket = serializers.SlugRelatedField(slug_field='id',
-                                          queryset=models.Ticket.objects.all()
-                                          )
-    past_message = serializers.SlugRelatedField(slug_field='id', queryset=models.Message.objects.all(), allow_null=True, allow_empty=True)
 
     class Meta:
         model = models.Message
-        fields = ('id', 'sender', 'ticket', 'text', 'past_message',)
+        fields = ('id', 'sender', 'text', 'past_message',)
 
 
 class TicketReadOnlySerializer(serializers.ModelSerializer):
@@ -39,6 +35,16 @@ class TicketDetailSerializer(serializers.ModelSerializer):
                                      read_only=True
                                      )
     messages = MessageSerializer(many=True)
+
+    def create(self, validated_data):
+        msgs = validated_data.pop('messages')
+        ticket = models.Ticket.objects.create(**validated_data)
+
+        for msg in msgs:
+            print(msg)
+            models.Message.objects.create(ticket=ticket, **msg)
+
+        return ticket
 
     class Meta:
         model = models.Ticket
