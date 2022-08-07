@@ -1,7 +1,3 @@
-import logging
-
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from helpdesk import models
 from api.tasks import send_email
@@ -15,43 +11,21 @@ class MessageSerializer(serializers.ModelSerializer):
         model = models.Message
 
 
-class TicketMessageSerializer(serializers.ModelSerializer):
+class TicketMessageCreateSerializer(serializers.ModelSerializer):
     sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    id = serializers.IntegerField(read_only=False)
 
     class Meta:
         model = models.Message
-        fields = ('id', 'ticket', 'sender', 'text')
+        fields = ('sender', 'text')
 
 
-class TicketMessageCreateSerializer(MessageSerializer):
-    class Meta:
-        model = models.Message
-        fields = ('sender', 'text', 'past_message')
-
-class TicketMessageUpdateSerializer(MessageSerializer):
-    sender = serializers.PrimaryKeyRelatedField(read_only=True)
-
-
-
-
-class TicketReadOnlySerializer(serializers.ModelSerializer):
-    title = serializers.CharField(read_only=True)
-    status = serializers.IntegerField(read_only=True)
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+class TicketCreateSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    messages = TicketMessageCreateSerializer(many=True)
 
     class Meta:
         model = models.Ticket
-        fields = ('id', 'user', 'title', 'status',)
-
-
-class TicketDetailSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    status = serializers.ChoiceField(choices=models.Ticket.Status.choices,
-                                     default=models.Ticket.Status.added,
-                                     read_only=True
-                                     )
-    messages = TicketMessageCreateSerializer(many=True)
+        fields = ('user', 'title', 'description', 'messages')
 
     def create(self, validated_data):
         msgs = validated_data.pop('messages')
@@ -62,38 +36,50 @@ class TicketDetailSerializer(serializers.ModelSerializer):
 
         return ticket
 
+
+class TicketMessageUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=False)
+
+    class Meta:
+        model = models.Message
+        fields = '__all__'
+
+
+class TicketUpdateSerializer(serializers.ModelSerializer):
+    messages = TicketMessageUpdateSerializer(many=True)
+
+    class Meta:
+        model = models.Ticket
+        fields = ('title', 'description', 'messages')
+
+    def validate(self, attrs):
+        messages_data = attrs['messages']
+        for msg in messages_data:
+            if not models.Message.objects.filter(pk=msg['id']).exists():
+                raise serializers.ValidationError({'detail': f'Message with id={msg["id"]} does not exists'})
+        return attrs
+
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
-        print(instance.user)
 
         for msg in validated_data['messages']:
-            try:
-                msg_instance = models.Message.objects.get(pk=msg['id'])
-            except ObjectDoesNotExist:
-                logging.error('Message does not exists')
-            else:
-                msg_instance.text = msg.get('text', msg_instance)
-                msg_instance.save()
+            msg_instance = models.Message.objects.get(pk=msg['id'])
+            msg_instance.text = msg.get('text', msg_instance)
+            msg_instance.save()
 
         return instance
 
-    def validate(self, attrs):
-        print('ATTRS:', attrs['user'])
-        messages_data = attrs['messages']
-        print(messages_data)
-        for msg in messages_data:
-            if not models.Message.objects.filter(pk=msg['id']).exists():
-                raise serializers.ValidationError({'detail': f'Message with id={msg["id"]} does not exists'})
-            if msg['sender'] != attrs['user']:
-                detail = {'detail': f'{msg["user"]} is not sender of message with id={msg["id"]}'}
-                raise serializers.ValidationError(detail=detail)
-        return attrs
 
+class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Ticket
-        fields = ('id', 'user', 'title', 'status', 'description', 'messages')
+        fields = '__all__'
+
+
+class TicketDetailSerializer(TicketSerializer):
+    messages = MessageSerializer(many=True)
 
 
 class SupportTicketDetailSerializer(serializers.ModelSerializer):

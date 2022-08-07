@@ -8,7 +8,7 @@ from api.permissions import IsAuthor
 
 class TicketViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.TicketReadOnlySerializer
+    serializer_class = serializers.TicketSerializer
 
     def get_queryset(self):
         print(self.request.data)
@@ -19,10 +19,15 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return serializers.TicketReadOnlySerializer
-        elif self.action == 'update' and self.request.user.is_staff:
-            if self.request.user != models.Ticket.objects.get(pk=self.kwargs['pk']).user:
-                return serializers.SupportTicketDetailSerializer
+            return serializers.TicketSerializer
+        elif self.action == 'create':
+            return serializers.TicketCreateSerializer
+        elif self.action == 'update':
+            if self.request.user.is_staff:
+                if self.request.user != models.Ticket.objects.get(pk=self.kwargs['pk']).user:
+                    return serializers.SupportTicketDetailSerializer
+            else:
+                return serializers.TicketUpdateSerializer
 
         return serializers.TicketDetailSerializer
 
