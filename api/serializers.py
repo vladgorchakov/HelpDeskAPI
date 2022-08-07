@@ -96,6 +96,7 @@ class SupportTicketDetailSerializer(serializers.ModelSerializer):
             instance.status = validated_data['status']
             instance.save()
             send_email.delay(instance.user.email,
+                             instance.title,
                              models.Ticket.Status.choices[validated_data['status']][1]
                              )
         return instance

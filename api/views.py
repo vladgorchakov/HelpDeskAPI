@@ -1,5 +1,4 @@
 from rest_framework import viewsets, mixins
-from rest_framework.response import Response
 from api import serializers
 from helpdesk import models
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
