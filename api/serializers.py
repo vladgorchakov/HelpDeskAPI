@@ -64,6 +64,7 @@ class TicketUpdateSerializer(serializers.ModelSerializer):
         for msg in messages_data:
             if not models.Message.objects.filter(pk=msg['id']).exists():
                 raise serializers.ValidationError({'detail': f'Message with id={msg["id"]} does not exists'})
+
         return attrs
 
     def update(self, instance, validated_data):
