@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from api.serializers import TicketSerializer, TicketCreateSerializer, SupportTicketDetailSerializer, \
-    TicketUpdateSerializer, TicketDetailSerializer, MessageSerializer, MessageDetailSerializer
+from api.serializers import TicketListSerializer, TicketCreateSerializer, SupportTicketDetailSerializer, \
+ TicketDetailSerializer, MessageSerializer, MessageDetailSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from api.permissions import IsAuthor
 from helpdesk.models import Ticket, Message
@@ -16,15 +16,12 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return TicketSerializer
+            return TicketListSerializer
         elif self.action == 'create':
             return TicketCreateSerializer
-        elif self.action == 'update':
-            if self.request.user.is_staff:
-                if self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
-                    return SupportTicketDetailSerializer
-            else:
-                return TicketUpdateSerializer
+        if self.request.user.is_staff:
+            if self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
+                return SupportTicketDetailSerializer
 
         return TicketDetailSerializer
 
