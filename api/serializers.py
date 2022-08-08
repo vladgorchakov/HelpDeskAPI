@@ -10,12 +10,15 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = "__all__"
         model = models.Message
 
+    #Дописать функцию валидации!!!!!
 
 class MessageDetailSerializer(serializers.ModelSerializer):
+    sender = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
     class Meta:
         fields = "__all__"
         model = models.Message
-        read_only_fields = ('sender', 'ticket', 'past_message')
+        read_only_fields = ('ticket',)
 
 
 class TicketMessageCreateSerializer(serializers.ModelSerializer):
@@ -51,17 +54,19 @@ class TicketListSerializer(serializers.ModelSerializer):
 
 
 class TicketDetailSerializer(serializers.ModelSerializer):
-    messages = MessageSerializer(many=True, read_only=True)
+    messages = MessageDetailSerializer(many=True, read_only=True)
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = models.Ticket
         fields = '__all__'
-        read_only_fields = ('status', 'messages', 'user')
+        read_only_fields = ('status', 'messages')
 
 
 class SupportTicketDetailSerializer(serializers.ModelSerializer):
     status = serializers.ChoiceField(choices=models.Ticket.Status.choices)
-    messages = MessageSerializer(many=True, read_only=True)
+    messages = MessageDetailSerializer(many=True, read_only=True)
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = models.Ticket

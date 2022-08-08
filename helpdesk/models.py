@@ -41,7 +41,6 @@ class Message(models.Model):
     text = models.TextField(max_length=1000)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
-    past_message = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.text
