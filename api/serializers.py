@@ -11,6 +11,13 @@ class MessageSerializer(serializers.ModelSerializer):
         model = models.Message
 
 
+class MessageDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = models.Message
+        read_only_fields = ('sender', 'ticket', 'past_message')
+
+
 class TicketMessageCreateSerializer(serializers.ModelSerializer):
     sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -83,13 +90,13 @@ class TicketDetailSerializer(TicketSerializer):
 
 
 class SupportTicketDetailSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    title = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
-    status = serializers.ChoiceField(choices=models.Ticket.Status.choices,
-                                     default=models.Ticket.Status.added,
-                                     )
+    status = serializers.ChoiceField(choices=models.Ticket.Status.choices)
     messages = MessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Ticket
+        fields = '__all__'
+        read_only_fields = ('user', 'title', 'description')
 
     def update(self, instance, validated_data):
         if validated_data['status'] != instance.status:
@@ -100,7 +107,3 @@ class SupportTicketDetailSerializer(serializers.ModelSerializer):
                              models.Ticket.Status.choices[validated_data['status']][1]
                              )
         return instance
-
-    class Meta:
-        model = models.Ticket
-        fields = '__all__'
