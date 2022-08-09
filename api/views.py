@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from api.serializers import TicketListSerializer, TicketCreateSerializer, SupportTicketDetailSerializer, \
  TicketDetailSerializer, MessageSerializer, MessageDetailSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from api.permissions import IsAuthor
+from api.permissions import IsAuthor, TickerCreaterOrAdmin
 from helpdesk.models import Ticket, Message
 
 
