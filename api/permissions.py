@@ -1,11 +1,11 @@
 from rest_framework import permissions
 
 
-class IsAuthor(permissions.BasePermission):
+class IsMessageAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.sender == request.user
 
 
-class TickerCreaterOrAdmin(permissions.BasePermission):
+class IsTicketAuthorOrStaff(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return False
+        return obj.user == request.user or request.user.is_staff
