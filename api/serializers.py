@@ -37,13 +37,14 @@ class TicketMessageCreateSerializer(serializers.ModelSerializer):
 
 class TicketCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    messages = TicketMessageCreateSerializer(many=True)
+    messages = TicketMessageCreateSerializer(many=True, allow_null=True)
 
     class Meta:
         model = models.Ticket
         fields = ('user', 'title', 'description', 'messages')
 
     def create(self, validated_data):
+        print('Hello')
         msgs = validated_data.pop('messages')
         ticket = models.Ticket.objects.create(**validated_data)
 
