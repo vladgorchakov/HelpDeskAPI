@@ -10,7 +10,7 @@
                 "username": "name",
                 "password": "12345nameuserpassword"
             }
-    2)  GET tokens:
+    2)  GET access and refresh tokens:
         - URL: http://0.0.0.0:8000/api/v1/token/
         - HTTP METHOD: [POST]
         - example:
@@ -19,12 +19,21 @@
                 "password": "12345nameuserpassword"
             }
 
-    3)  GET list of tickets
+    3) GET new access token:
+        - URL: http://0.0.0.0:8000/api/v1/token/
+        - HTTP METHOD: [POST]
+        - example:
+            {
+                "refresh": "{YOUR_REFRESH_TOKENS}"
+            }
+
+
+    4)  GET list of tickets
         - URL: http://0.0.0.0:8000/api/v1/tickets/
         - HTTP METHOD [GET]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
 
-    4) CREATE ticket
+    5) CREATE ticket
         - URL: http://0.0.0.0:8000/api/v1/tickets/
         - HTTP METHOD [POST]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
@@ -63,12 +72,12 @@
                 "messages": []
             }
 
-    5) READ ticket
+    6) READ ticket
         - URL: http://0.0.0.0:8000/api/v1/tickets/{id}/
         - HTTP METHOD: [GET]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
     
-    6) UPDATE ticket
+    7) UPDATE ticket
         - URL: http://0.0.0.0:8000/api/v1/tickets/{id}/
         - HTTP METHOD: [PUT]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
@@ -84,17 +93,17 @@
                 "status": "1"
             }
             
-    7) DELETE ticket
+    8) DELETE ticket
         - URL: http://0.0.0.0:8000/api/v1/tickets/{id}/
         - HTTP METHOD: [DELETE]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
 
-    8) GET list of messages
+    9) GET list of messages
         - URL: http://0.0.0.0:8000/api/v1/messaage/
         - HTTP METHOD: [GET]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
     
-    9) CREATE message
+    10) CREATE message
         - URL: http://0.0.0.0:8000/api/v1/messaage/
         - HTTP METHOD: [POST]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
@@ -104,7 +113,7 @@
                 "text": "new message for ticket id=5"
             }
     
-    10) UPDATE message
+    11) UPDATE message
         - URL: http://0.0.0.0:8000/api/v1/messaage/
         - HTTP METHOD: [PUT]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
@@ -113,7 +122,7 @@
                 "text": "Update message for ticket id=5"
             }
     
-    10) DELETE message
+    12) DELETE message
         - URL: http://0.0.0.0:8000/api/v1/messaage/
         - HTTP METHOD: [DELETE]
         - Authorization HEADER: Bearer {YOUR_ACCESS_TOKEN}
