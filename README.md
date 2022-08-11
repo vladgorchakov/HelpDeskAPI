@@ -1,5 +1,17 @@
 # helpdeskAPI
 
+## Run helpdeskAPI:
+    1) Run docker-compose:
+        sudo docker-compose up --build
+    2) Connect to container with helpdeskapi_web:
+        dokcer exec -it docker_container_id bash
+    3) Make migration to db:
+        python3 manage.py makemigrations
+        python3 manage.py migrate
+    4) Create superuser:
+        pytrhon3 manage.py createsuperuser
+    5) Exit
+
 ## Endpoints of helpdesk API:
     1)  REGISTER a new user:
         - URL: http://0.0.0.0:8000/api/v1/auth/users/
