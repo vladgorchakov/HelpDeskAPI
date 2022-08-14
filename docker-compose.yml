@@ -9,21 +9,25 @@ services:
     volumes:
       - /code/
     command: python3 manage.py runserver 0.0.0.0:8000
-    environment:
-      - DB_HOST=db
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASSWORD}
+#    environment:
+#      - DB_HOST=db
+#      - DB_NAME=$DB_NAME
+#      - DB_USER=$DB_USER
+#      - DB_PASS=$DB_PASSWORD
     depends_on:
       - db
+    env_file:
+      - .env
   db:
     image: postgres
     volumes:
       - ./data/db:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+#    environment:
+#      - POSTGRES_USER=${DB_USER}
+#      - POSTGRES_PASSWORD=${DB_PASSWORD}
+#      - POSTGRES_DB=${DB_NAME}
+    env_file:
+      - .env
   redis:
     image: redis
   celery:
