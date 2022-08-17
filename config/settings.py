@@ -178,6 +178,7 @@ SIMPLE_JWT = {
 
 # Email sending
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
 
 
 # CELERY REDIS
