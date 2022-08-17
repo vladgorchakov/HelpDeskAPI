@@ -21,10 +21,12 @@ class TicketViewSet(viewsets.ModelViewSet):
         return Ticket.objects.filter(user=self.request.user).order_by('-update_time')
 
     def get_serializer_class(self):
-        if self.action == 'list':
-            return TicketListSerializer
-        elif self.action == 'create':
-            return TicketCreateSerializer
+        match self.action:
+            case 'list':
+                return TicketListSerializer
+            case 'create':
+                return TicketCreateSerializer
+
         if self.request.user.is_staff and self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
             return SupportTicketDetailSerializer
 
