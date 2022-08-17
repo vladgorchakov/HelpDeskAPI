@@ -25,9 +25,8 @@ class TicketViewSet(viewsets.ModelViewSet):
             return TicketListSerializer
         elif self.action == 'create':
             return TicketCreateSerializer
-        if self.request.user.is_staff:
-            if self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
-                return SupportTicketDetailSerializer
+        if self.request.user.is_staff and self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
+            return SupportTicketDetailSerializer
 
         return TicketDetailSerializer
 
