@@ -4,10 +4,11 @@ services:
   web:
     build:
       context: .
+    restart: always
     ports:
       - "8000:8000"
     volumes:
-      - /code/
+      - .:/code/
     command: python3 manage.py runserver 0.0.0.0:8000
 #    environment:
 #      - DB_HOST=db
@@ -36,7 +37,7 @@ services:
       context: .
     command: celery -A api worker -l info
     volumes:
-      - /code/
+      - .:/code/
     depends_on:
       - db
       - redis
