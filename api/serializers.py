@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from helpdesk import models
-from api.tasks import send_email
 
 
 class MessageSerializer(serializers.ModelSerializer):
