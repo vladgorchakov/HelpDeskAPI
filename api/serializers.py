@@ -44,7 +44,6 @@ class TicketCreateSerializer(serializers.ModelSerializer):
         fields = ('user', 'title', 'description', 'messages')
 
     def create(self, validated_data):
-        print('Hello')
         msgs = validated_data.pop('messages')
         ticket = models.Ticket.objects.create(**validated_data)
 
@@ -79,13 +78,3 @@ class SupportTicketDetailSerializer(serializers.ModelSerializer):
         model = models.Ticket
         fields = '__all__'
         read_only_fields = ('user', 'title', 'description')
-
-    def update(self, instance, validated_data):
-        if validated_data['status'] != instance.status:
-            instance.status = validated_data['status']
-            instance.save()
-            send_email.delay(instance.user.email,
-                             instance.title,
-                             models.Ticket.Status.choices[validated_data['status']][1]
-                             )
-        return instance
