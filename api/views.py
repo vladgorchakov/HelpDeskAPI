@@ -10,7 +10,7 @@ from api.serializers import (
                              MessageDetailSerializer)
 
 from rest_framework.permissions import IsAuthenticated
-from api.permissions import IsMessageAuthor, IsTicketAuthorOrStaff
+from api.permissions import IsMessageAuthor, IsTicketAuthorOrStaff, IsTicketMessageAuthorOrStaff
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
 from django.core.exceptions import ObjectDoesNotExist
@@ -67,3 +67,14 @@ class MessageViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'create'):
             return MessageSerializer
         return MessageDetailSerializer
+
+    def get_permissions(self):
+        match self.action:
+            case 'create':
+                permission_classes = [IsAuthenticated, IsTicketMessageAuthorOrStaff]
+            case 'update':
+                permission_classes = [IsAuthenticated, IsMessageAuthor]
+            case _:
+                permission_classes = [IsAuthenticated, IsMessageAuthor]
+
+        return [permission() for permission in permission_classes]
