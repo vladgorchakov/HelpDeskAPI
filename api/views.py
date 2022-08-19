@@ -2,12 +2,12 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from api.serializers import (
-                             TicketListSerializer,
-                             TicketCreateSerializer,
-                             SupportTicketDetailSerializer,
-                             TicketDetailSerializer,
-                             MessageSerializer,
-                             MessageDetailSerializer)
+    TicketListSerializer,
+    TicketCreateSerializer,
+    SupportTicketDetailSerializer,
+    TicketDetailSerializer,
+    MessageSerializer,
+    MessageDetailSerializer)
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from api.permissions import IsTicketAuthorOrStaff, MessagePermissions
@@ -19,25 +19,17 @@ from django.core.exceptions import ObjectDoesNotExist
 class TicketViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsTicketAuthorOrStaff]
 
-    def update(self, request, *args, **kwargs):
-        try:
-            instance = Ticket.objects.get(pk=kwargs['pk'])
-        except ObjectDoesNotExist:
-            return Response({'error': 'ticket does not exist'})
-
-        if self.request.user.is_staff and self.request.user != instance.user:
-            serializer = SupportTicketDetailSerializer(data=request.data, instance=instance)
+    def perform_update(self, serializer):
+        if isinstance(serializer, SupportTicketDetailSerializer):
+            status_old = serializer.instance.status
+            serializer.save(status=self.request.data['status'])
+            if status_old != int(serializer.instance.status):
+                send_email.delay(serializer.instance.user.email,
+                                 serializer.instance.title,
+                                 Ticket.Status.choices[int(serializer.instance.status)][1]
+                                 )
         else:
-            serializer = TicketDetailSerializer(data=request.data, instance=instance)
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        send_email.delay(instance.user.email,
-                         instance.title,
-                         Ticket.Status.choices[instance.status]
-                         )
-
-        return Response(serializer.data)
+            serializer.save()
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -51,6 +43,8 @@ class TicketViewSet(viewsets.ModelViewSet):
             case 'create':
                 return TicketCreateSerializer
 
+        if self.request.user.is_staff and self.request.user != Ticket.objects.get(pk=self.kwargs['pk']).user:
+            return SupportTicketDetailSerializer
         return TicketDetailSerializer
 
 
@@ -67,4 +61,3 @@ class MessageViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'create'):
             return MessageSerializer
         return MessageDetailSerializer
-
