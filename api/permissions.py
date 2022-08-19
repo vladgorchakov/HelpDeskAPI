@@ -1,4 +1,6 @@
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
+
 from helpdesk.models import Ticket
 
 
@@ -12,8 +14,19 @@ class IsTicketAuthorOrStaff(permissions.BasePermission):
         return obj.user == request.user or request.user.is_staff
 
 
-# TicketMessageAuthorOrStaff пермиссии для того, кто добавляет сообщения к таске
-class IsTicketMessageAuthorOrStaff(permissions.BasePermission):
-
+class MessagePermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user == obj.ticket.user or request.user.is_staff
+        match view.action:
+            case 'list':
+                return bool(request.user.is_staff)
+            case 'retrieve':
+                return bool(request.user == obj.sender or request.user.is_staff)
+            case 'update':
+                print('update')
+                return bool(request.user == obj.sender)
+            case 'create':
+                print('create', obj.ticket.user, request.user)
+                # return bool(request.user == obj.ticket.user)
+                return False
+            case 'destroy':
+                return bool(request.user == obj.sender)

@@ -9,8 +9,8 @@ from api.serializers import (
                              MessageSerializer,
                              MessageDetailSerializer)
 
-from rest_framework.permissions import IsAuthenticated
-from api.permissions import IsMessageAuthor, IsTicketAuthorOrStaff, IsTicketMessageAuthorOrStaff
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from api.permissions import IsTicketAuthorOrStaff, MessagePermissions
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
 from django.core.exceptions import ObjectDoesNotExist
@@ -55,7 +55,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsMessageAuthor, ]
+    permission_classes = [MessagePermissions]
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -68,13 +68,3 @@ class MessageViewSet(viewsets.ModelViewSet):
             return MessageSerializer
         return MessageDetailSerializer
 
-    def get_permissions(self):
-        match self.action:
-            case 'create':
-                permission_classes = [IsAuthenticated, IsTicketMessageAuthorOrStaff]
-            case 'update':
-                permission_classes = [IsAuthenticated, IsMessageAuthor]
-            case _:
-                permission_classes = [IsAuthenticated, IsMessageAuthor]
-
-        return [permission() for permission in permission_classes]
