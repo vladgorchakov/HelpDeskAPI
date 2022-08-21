@@ -8,7 +8,7 @@ class IsMessageAuthor(permissions.BasePermission):
         return obj.sender == request.user
 
 
-class IsTicketAuthorOrStaff(permissions.BasePermission):
+class IsAuthorOrStaff(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user or request.user.is_staff
 
@@ -31,3 +31,8 @@ class MessagePermissions(permissions.BasePermission):
             return bool(request.user.is_staff or request.user == obj.sender)
         else:
             return bool(request.user == obj.sender)
+
+
+# можно разбить на пермисии и обозначить их во вьюхе
+# а также изменить модель Сообщение, чтобы поля юзер были одиноковы
+# с тикетом.

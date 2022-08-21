@@ -9,13 +9,13 @@ from api.serializers import (
     MessageDetailSerializer)
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from api.permissions import IsTicketAuthorOrStaff, MessagePermissions
+from api.permissions import IsAuthorOrStaff, MessagePermissions
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsTicketAuthorOrStaff]
+    permission_classes = [IsAuthenticated, IsAuthorOrStaff]
 
     def perform_update(self, serializer):
         if isinstance(serializer, SupportTicketDetailSerializer):
@@ -47,7 +47,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    permission_classes = [MessagePermissions]
+    permission_classes = [IsAuthenticated, MessagePermissions]
 
     def get_queryset(self):
         if self.request.user.is_staff:
