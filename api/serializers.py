@@ -9,13 +9,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = "__all__"
         model = models.Message
 
-    def validate(self, attrs):
-        if attrs['sender'] != attrs['ticket'].user and not attrs['sender'].is_staff:
-            error_msg = f'User id={attrs["sender"].id} is not staff or owner of ticket with id={attrs["ticket"].id}'
-            raise serializers.ValidationError({'detail': error_msg})
-
-        return attrs
-
 
 class MessageDetailSerializer(serializers.ModelSerializer):
     sender = serializers.SlugRelatedField(slug_field='username', read_only=True)

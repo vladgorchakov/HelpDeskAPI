@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from rest_framework.response import Response
 
 from api.serializers import (
     TicketListSerializer,
@@ -13,7 +12,6 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from api.permissions import IsTicketAuthorOrStaff, MessagePermissions
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
-from django.core.exceptions import ObjectDoesNotExist
 
 
 class TicketViewSet(viewsets.ModelViewSet):
