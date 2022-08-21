@@ -1,8 +1,4 @@
 from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import SAFE_METHODS
-from rest_framework.response import Response
-
 from helpdesk.models import Ticket
 from django.core.exceptions import ObjectDoesNotExist
 
