@@ -42,5 +42,7 @@ services:
       - db
       - redis
       - web
+    env_file:
+      - .env
 volumes:
   pgdata:
