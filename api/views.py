@@ -9,7 +9,7 @@ from api.serializers import (
     MessageDetailSerializer)
 
 from rest_framework.permissions import IsAuthenticated
-from api.permissions import IsAuthorOrStaff, MessagePermissions, IsTicketAuthorOrStaff, IsAuthor
+from api.permissions import IsAuthorOrStaff, IsTicketAuthorOrStaff, IsAuthor
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
 
