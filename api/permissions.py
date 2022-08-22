@@ -25,28 +25,3 @@ class IsTicketAuthorOrStaff(permissions.BasePermission):
                     return True
 
         return True
-
-
-class MessagePermissions(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if view.action == 'create':
-            ticket_id = request.data.get('ticket', None)
-            if ticket_id:
-                try:
-                    return bool(request.user == Ticket.objects.get(pk=ticket_id).user
-                                or request.user.is_staff)
-                except ObjectDoesNotExist:
-                    return True
-
-        return True
-
-    def has_object_permission(self, request, view, obj):
-        if view.action == 'retrieve':
-            return bool(request.user.is_staff or request.user == obj.user)
-        else:
-            return bool(request.user == obj.user)
-
-
-# можно разбить на пермисии и обозначить их во вьюхе
-# а также изменить модель Сообщение, чтобы поля юзер были одиноковы
-# с тикетом.
