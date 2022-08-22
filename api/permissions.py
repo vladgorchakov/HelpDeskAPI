@@ -42,9 +42,9 @@ class MessagePermissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if view.action == 'retrieve':
-            return bool(request.user.is_staff or request.user == obj.sender)
+            return bool(request.user.is_staff or request.user == obj.user)
         else:
-            return bool(request.user == obj.sender)
+            return bool(request.user == obj.user)
 
 
 # можно разбить на пермисии и обозначить их во вьюхе

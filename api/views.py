@@ -8,7 +8,7 @@ from api.serializers import (
     MessageSerializer,
     MessageDetailSerializer)
 
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from api.permissions import IsAuthorOrStaff, MessagePermissions
 from helpdesk.models import Ticket, Message
 from api.tasks import send_email
@@ -53,7 +53,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return Message.objects.all()
         else:
-            return Message.objects.filter(sender=self.request.user).order_by('-update_time')
+            return Message.objects.filter(user=self.request.user).order_by('-update_time')
 
     def get_serializer_class(self):
         if self.action in ('list', 'create'):

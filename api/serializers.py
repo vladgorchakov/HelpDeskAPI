@@ -3,7 +3,7 @@ from helpdesk import models
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = "__all__"
@@ -11,7 +11,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class MessageDetailSerializer(serializers.ModelSerializer):
-    sender = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         fields = "__all__"
@@ -20,11 +20,11 @@ class MessageDetailSerializer(serializers.ModelSerializer):
 
 
 class TicketMessageCreateSerializer(serializers.ModelSerializer):
-    sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = models.Message
-        fields = ('sender', 'text')
+        fields = ('user', 'text')
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):

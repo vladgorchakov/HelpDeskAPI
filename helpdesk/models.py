@@ -31,7 +31,7 @@ class Ticket(TimeMixin):
 
 
 class Message(TimeMixin):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE, related_name='messages')
     text = models.TextField(max_length=1000)
 
