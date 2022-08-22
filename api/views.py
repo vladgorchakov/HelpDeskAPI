@@ -60,14 +60,13 @@ class MessageViewSet(viewsets.ModelViewSet):
         return MessageDetailSerializer
 
     def get_permissions(self):
+        permissions = [IsAuthenticated]
         match self.action:
-            case 'list':
-                permissions = [IsAuthenticated]
             case 'create':
-                permissions = [IsAuthenticated, IsTicketAuthorOrStaff]
+                permissions.append(IsTicketAuthorOrStaff)
             case 'retrieve':
-                permissions = [IsAuthenticated, IsTicketAuthorOrStaff]
+                permissions.append(IsTicketAuthorOrStaff)
             case _:
-                permissions = [IsAuthenticated, IsAuthor]
+                permissions.append(IsAuthor)
 
         return [permission() for permission in permissions]
