@@ -1,12 +1,23 @@
 import pytest
+from rest_framework.test import APIClient
+
+from .testuser import TestUser
+
+
+@pytest.fixture
+def client():
+    return APIClient()
+
+@pytest.fixture
+def user():
 
 
 @pytest.fixture(scope='session')
-def get_user_payload():
-    payload = {
-        "email": "user@helpdesk.com",
-        "username": "helpdeskuser",
-        "password": "helpdeskPassword54"
-    }
+def get_user():
+    user = TestUser(
+        username='helpdeskuser',
+        password='testPass12345',
+        email='helpdeskuser@helpdesk.com'
+    )
 
-    return payload
+    return user
