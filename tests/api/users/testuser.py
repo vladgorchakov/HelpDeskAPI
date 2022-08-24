@@ -1,14 +1,17 @@
+from django.contrib.auth.models import User
+
+
 class TestUser:
     def __init__(self, username, password, email):
         self.username = username
         self.email = email
-        self.__password = password
+        self.password = password
 
     def get_payload(self):
         payload = {
             "username": self.username,
             "email": self.email,
-            "password": self.__password
+            "password": self.password
         }
 
         return payload
@@ -16,7 +19,7 @@ class TestUser:
     def get_payload_with_incorrect_data(self):
         payload = {
             "username": self.username + 'x',
-            "password": self.__password + 'x54x'
+            "password": self.password + 'x54x'
         }
 
         return payload
