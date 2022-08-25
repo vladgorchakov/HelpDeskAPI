@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
+import pytest
 
 
-class TestUser:
+class UserData:
     def __init__(self, username, password, email):
         self.username = username
         self.email = email

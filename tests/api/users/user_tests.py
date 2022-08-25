@@ -40,7 +40,7 @@ def test_login_user_fail(client, user):
 
 @pytest.mark.django_db
 def test_user_info(auth_client_throw_token):
-    client = auth_client_throw_token
+    client, user = auth_client_throw_token
     endpoint = 'api/v1/auth/users/'
     response = client.get(url + endpoint)
 
@@ -50,7 +50,15 @@ def test_user_info(auth_client_throw_token):
 @pytest.mark.django_db
 def test_token(auth_client_throw_token):
     endpoints = 'api/v1/'
-    client = auth_client_throw_token
+    client, user = auth_client_throw_token
     response = client.get(url + endpoints)
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_admin_acc(auth_admin_client_throw_token):
+    admin = auth_admin_client_throw_token
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', admin.email)
+
+    assert admin.username == 'admin'
